@@ -91,6 +91,23 @@ describe("smart shuffle timing", () => {
     expect(recommendedIds()).toEqual([]);
   });
 
+  it("ignores recommendations that were requested before smart shuffle was turned off", async () => {
+    const { spy, release } = deferredRadio();
+    const firstMix = playerEngine.setShuffleMode("smart");
+    const firstBatchCalls = spy.mock.calls.length;
+
+    await playerEngine.setShuffleMode("playlist");
+    const secondMix = playerEngine.setShuffleMode("smart");
+    release();
+    await Promise.all([firstMix, secondMix]);
+
+    const firstBatchIds = new Set(
+      Array.from({ length: firstBatchCalls * 2 }, (_, i) => `rec${i}`),
+    );
+    expect(recommendedIds().length).toBeGreaterThan(0);
+    expect(recommendedIds().some((id) => firstBatchIds.has(id))).toBe(false);
+  });
+
   it("does not mix recommendations into a radio station", async () => {
     const { spy, release } = deferredRadio();
     usePlayerStore.setState({ playbackContext: "radio:l0" });

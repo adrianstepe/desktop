@@ -918,6 +918,7 @@ class PlayerEngine {
     if (store.shuffleMode === mode) return;
 
     const prevMode = store.shuffleMode;
+    if (prevMode === "smart") this.clearSmartMix();
     store.setShuffleMode(mode);
 
     const { queue, currentIndex } = store;
