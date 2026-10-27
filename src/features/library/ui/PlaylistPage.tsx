@@ -24,7 +24,7 @@ import {
   HERO_GLASS_BUTTON_CLASS,
   HERO_GLASS_CLASS,
 } from "@/shared/ui";
-import { usePageBackdrop } from "@/shared/lib";
+import { cn, usePageBackdrop } from "@/shared/lib";
 import { useClassicSurfaces } from "@/features/settings/store/customizationStore";
 import { useLikesCover } from "../hooks/useLikesCover";
 import { useAuthStore } from "@/features/auth";
@@ -687,11 +687,13 @@ function LibraryPlaylistContent() {
                         variant="secondary"
                         onClick={handleShufflePlay}
                         disabled={currentTracks.length === 0}
-                        className={`${HERO_BUTTON_CLASS} ${HERO_GLASS_BUTTON_CLASS} !w-[52px] !p-0 text-text-primary ${
-                          isShuffleEngaged
-                            ? "!bg-black/[0.12] dark:!bg-white/[0.2] hover:!bg-black/[0.15] dark:hover:!bg-white/[0.24]"
-                            : ""
-                        }`}
+                        className={cn(
+                          HERO_BUTTON_CLASS,
+                          HERO_GLASS_BUTTON_CLASS,
+                          "!w-[52px] !p-0 text-text-primary",
+                          isShuffleEngaged &&
+                            "!bg-black/[0.12] dark:!bg-white/[0.2] hover:!bg-black/[0.15] dark:hover:!bg-white/[0.24]",
+                        )}
                         aria-pressed={isShuffleEngaged}
                         title={
                           isPlayingCurrentPlaylist

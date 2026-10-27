@@ -3,9 +3,19 @@ import { Shuffle } from "@solar-icons/react";
 import type { ShuffleMode } from "../store/playerStore";
 import { cn } from "@/shared/lib";
 
+export type ShuffleIconSize = 18 | 24;
+
+const ICON_SIZE: Record<
+  ShuffleIconSize,
+  { box: string; sparkle: number; offset: string }
+> = {
+  18: { box: "size-[18px]", sparkle: 8, offset: "-top-[3px] -left-[3px]" },
+  24: { box: "size-[24px]", sparkle: 11, offset: "-top-[4px] -left-[4px]" },
+};
+
 export interface ShuffleIconProps {
   mode: ShuffleMode;
-  size?: number;
+  size?: ShuffleIconSize;
   className?: string;
   icon?: ReactNode;
 }
@@ -37,22 +47,17 @@ export function ShuffleIcon({
   className,
   icon,
 }: ShuffleIconProps) {
-  const sparkleSize = Math.max(7, Math.round(size * 0.45));
-  const offset = -Math.round(sparkleSize * 0.4);
+  const dims = ICON_SIZE[size];
 
   return (
     <span
-      className={cn("relative inline-flex shrink-0", className)}
-      style={{ width: size, height: size }}
+      className={cn("relative inline-flex shrink-0", dims.box, className)}
       data-shuffle-mode={mode}
     >
       {icon ?? <Shuffle size={size} weight="Outline" />}
       {mode === "smart" && (
-        <span
-          className="absolute flex pointer-events-none"
-          style={{ top: offset, left: offset }}
-        >
-          <SparkleStar size={sparkleSize} />
+        <span className={cn("absolute flex pointer-events-none", dims.offset)}>
+          <SparkleStar size={dims.sparkle} />
         </span>
       )}
     </span>

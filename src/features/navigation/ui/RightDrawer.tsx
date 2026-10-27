@@ -7,9 +7,9 @@ import {
   playerEngine,
   isRadioContext,
   nextRepeatMode,
+  SparkleStar,
 } from "@/features/player";
 import SongCardWithMenu from "@/features/player/ui/SongCardWithMenu";
-import { SparkleStar } from "@/features/player/ui/ShuffleIcon";
 import { useTranslation } from "@/languages";
 import {
   ReorderDropPlaceholder,

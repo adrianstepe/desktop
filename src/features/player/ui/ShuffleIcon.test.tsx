@@ -1,11 +1,12 @@
 import { act } from "react";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { createRoot, Root } from "react-dom/client";
-import { ShuffleIcon } from "./ShuffleIcon";
+import { ShuffleIcon, type ShuffleIconSize } from "./ShuffleIcon";
 import type { ShuffleMode } from "../store/playerStore";
 
-// @ts-expect-error - act support flag in vitest browserless DOM environment
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+(
+  globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true;
 
 const SPARKLE = "svg path[d^='M8 0']";
 
@@ -28,7 +29,7 @@ describe("ShuffleIcon", () => {
     root = null;
   });
 
-  const render = (mode: ShuffleMode, size = 18) => {
+  const render = (mode: ShuffleMode, size: ShuffleIconSize = 18) => {
     act(() => {
       root?.render(<ShuffleIcon mode={mode} size={size} />);
     });
@@ -39,8 +40,8 @@ describe("ShuffleIcon", () => {
   it("keeps the same icon size in every mode", () => {
     for (const mode of ["off", "playlist", "smart"] as const) {
       const { box } = render(mode, 24);
-      expect(box?.style.width).toBe("24px");
-      expect(box?.style.height).toBe("24px");
+      expect(box?.className).toContain("size-[24px]");
+      expect(box?.getAttribute("style")).toBeNull();
     }
   });
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { playerEngine } from "./playerEngine";
 import { usePlayerStore } from "../store/playerStore";
 import type { Track } from "@/shared/types";
@@ -28,6 +28,11 @@ describe("playerEngine shuffle modes (off, playlist, smart)", () => {
       autoplaySimilar: true,
     });
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it("cycles shuffle modes in correct order: off -> playlist -> smart -> off", async () => {
@@ -74,21 +79,34 @@ describe("playerEngine shuffle modes (off, playlist, smart)", () => {
     expect(stateOff.queue.find((t) => t.isRecommended)).toBeUndefined();
   });
 
-  it("does not fetch or append similar tracks when shuffleMode is playlist", async () => {
-    const getRadioSpy = vi.spyOn(api, "getRadio");
+  const reachLastTrack = async (shuffleMode: "off" | "playlist") => {
+    vi.useFakeTimers();
+    const getRadioSpy = vi
+      .spyOn(api, "getRadio")
+      .mockResolvedValue({ items: [] });
     const tracks = [mockTrack("a"), mockTrack("b")];
 
     usePlayerStore.setState({
       queue: tracks,
-      currentIndex: 1,
-      currentTrack: tracks[1],
-      shuffleMode: "playlist",
-      shuffle: true,
+      currentIndex: 0,
+      currentTrack: tracks[0],
+      shuffleMode,
+      shuffle: shuffleMode !== "off",
       autoplaySimilar: true,
     });
 
     await playerEngine.skipNext(true);
+    await vi.advanceTimersByTimeAsync(500);
+    return getRadioSpy;
+  };
 
+  it("fetches similar tracks at the end of a list when shuffle is off", async () => {
+    const getRadioSpy = await reachLastTrack("off");
+    expect(getRadioSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not fetch similar tracks at the end of a list in playlist shuffle", async () => {
+    const getRadioSpy = await reachLastTrack("playlist");
     expect(getRadioSpy).not.toHaveBeenCalled();
   });
 });

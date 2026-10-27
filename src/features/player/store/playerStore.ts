@@ -16,6 +16,10 @@ export { debouncedStorage };
 
 export type RepeatMode = "off" | "all" | "one";
 export type ShuffleMode = "off" | "playlist" | "smart";
+
+function isShuffleMode(value: unknown): value is ShuffleMode {
+  return value === "off" || value === "playlist" || value === "smart";
+}
 export type PlayerStatus = "idle" | "loading" | "playing" | "paused" | "error";
 export type MiniPlayerStyle = "default" | "rounded";
 export type AudioQuality = "low" | "standard" | "high" | "lossless";
@@ -309,10 +313,11 @@ export const usePlayerStore = create<PlayerStore>()(
       name: PLAYER_SESSION_STORAGE_KEY,
       storage: createIncrementalJSONStorage(debouncedStorage),
       merge: (persisted, current) => {
-        const merged = {
-          ...current,
-          ...((persisted ?? {}) as Partial<PlayerStore>),
-        };
+        const persistedState = (persisted ?? {}) as Partial<PlayerStore>;
+        const merged = { ...current, ...persistedState };
+        if (!isShuffleMode(persistedState.shuffleMode)) {
+          merged.shuffleMode = persistedState.shuffle ? "playlist" : "off";
+        }
         const resume = readResumePosition();
         if (resume && merged.currentTrack?.id === resume.trackId) {
           merged.positionMs = resume.positionMs;
@@ -375,11 +380,7 @@ export const usePlayerStore = create<PlayerStore>()(
           if (typeof state.isEqEnabled !== "boolean") {
             state.isEqEnabled = false;
           }
-          if (
-            state.shuffleMode !== "off" &&
-            state.shuffleMode !== "playlist" &&
-            state.shuffleMode !== "smart"
-          ) {
+          if (!isShuffleMode(state.shuffleMode)) {
             state.shuffleMode = state.shuffle ? "playlist" : "off";
           }
           state.shuffle = state.shuffleMode !== "off";

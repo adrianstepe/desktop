@@ -18,6 +18,7 @@ import { HeartFill, HeartLine } from "@mingcute/react";
 
 import { PlayerMorphIcon, ICON_PLAY, ICON_PAUSE } from "./morphPlayerIcons";
 import { ShuffleIcon } from "./ShuffleIcon";
+import { cn } from "@/shared/lib";
 
 import { usePlayerState } from "../hooks/usePlayerState";
 import { playerEngine } from "../engine/playerEngine";
@@ -799,11 +800,12 @@ function MiniPlayer({
             >
               <button
                 type="button"
-                aria-label="Shuffle"
+                aria-label={t(`player.shuffle_${player.shuffleMode}`)}
                 title={t(`player.shuffle_${player.shuffleMode}`)}
-                className={`${iconButtonClass} ${
-                  player.shuffleMode !== "off" ? activeToggleClass : ""
-                }`}
+                className={cn(
+                  iconButtonClass,
+                  player.shuffleMode !== "off" && activeToggleClass,
+                )}
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={() => playerEngine.cycleShuffleMode()}
               >

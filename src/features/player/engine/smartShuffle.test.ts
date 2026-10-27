@@ -30,7 +30,7 @@ const injectSmartMix = (): Promise<void> => {
   const fn = Reflect.get(playerEngine, "injectSmartMix") as (
     session: number,
   ) => Promise<void>;
-  return fn.call(playerEngine, Reflect.get(playerEngine, "sessionId"));
+  return fn.call(playerEngine, Reflect.get(playerEngine, "queueEpoch"));
 };
 
 describe("smart shuffle (Spotify style)", () => {

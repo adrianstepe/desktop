@@ -10,9 +10,8 @@ describe("shuffle mode", () => {
   });
 
   it("handles unknown values safely", () => {
-    expect(nextShuffleMode("unknown" as unknown as ShuffleMode)).toBe(
-      "playlist",
-    );
+    const unknownMode: ShuffleMode = JSON.parse('"unknown"');
+    expect(nextShuffleMode(unknownMode)).toBe("playlist");
   });
 
   it("contains all 3 supported modes", () => {

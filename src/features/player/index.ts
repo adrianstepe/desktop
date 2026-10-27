@@ -25,7 +25,11 @@ export {
 } from "./hooks/useSongMenuItems";
 
 export { default as MiniPlayer, type MiniPlayerProps } from "./ui/MiniPlayer";
-export { ShuffleIcon, type ShuffleIconProps } from "./ui/ShuffleIcon";
+export {
+  ShuffleIcon,
+  SparkleStar,
+  type ShuffleIconProps,
+} from "./ui/ShuffleIcon";
 export {
   FullscreenPlayer,
   default as PlayerPage,
