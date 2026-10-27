@@ -15,6 +15,7 @@ import {
 export { debouncedStorage };
 
 export type RepeatMode = "off" | "all" | "one";
+export type ShuffleMode = "off" | "playlist" | "smart";
 export type PlayerStatus = "idle" | "loading" | "playing" | "paused" | "error";
 export type MiniPlayerStyle = "default" | "rounded";
 export type AudioQuality = "low" | "standard" | "high" | "lossless";
@@ -58,6 +59,7 @@ export interface SessionState {
   volume: number;
   repeat: RepeatMode;
   shuffle: boolean;
+  shuffleMode: ShuffleMode;
   audioQuality: AudioQuality;
   miniPlayerStyle: MiniPlayerStyle;
   accentVariant: AccentVariant;
@@ -110,6 +112,7 @@ export interface PlayerStore extends PlayerState {
   setPlaybackMode: (mode: "hls" | "mp3" | null) => void;
   setRepeat: (mode: RepeatMode) => void;
   setShuffle: (shuffle: boolean) => void;
+  setShuffleMode: (shuffleMode: ShuffleMode) => void;
   setVolume: (volume: number) => void;
   setCurrentTrack: (track: Track | null, index: number) => void;
   setQueue: (queue: Track[]) => void;
@@ -187,6 +190,7 @@ export const usePlayerStore = create<PlayerStore>()(
       volume: 1,
       repeat: "off",
       shuffle: false,
+      shuffleMode: "off",
       audioQuality: "high",
       miniPlayerStyle: "default",
       accentVariant: "default",
@@ -214,7 +218,10 @@ export const usePlayerStore = create<PlayerStore>()(
       setDuration: (durationMs) => set({ durationMs }),
       setPlaybackMode: (playbackMode) => set({ playbackMode }),
       setRepeat: (repeat) => set({ repeat }),
-      setShuffle: (shuffle) => set({ shuffle }),
+      setShuffle: (shuffle) =>
+        set({ shuffle, shuffleMode: shuffle ? "playlist" : "off" }),
+      setShuffleMode: (shuffleMode) =>
+        set({ shuffleMode, shuffle: shuffleMode !== "off" }),
       setVolume: (volume) => set({ volume }),
       setCurrentTrack: (currentTrack, currentIndex) => {
         const prev = get().currentTrack;
@@ -368,6 +375,14 @@ export const usePlayerStore = create<PlayerStore>()(
           if (typeof state.isEqEnabled !== "boolean") {
             state.isEqEnabled = false;
           }
+          if (
+            state.shuffleMode !== "off" &&
+            state.shuffleMode !== "playlist" &&
+            state.shuffleMode !== "smart"
+          ) {
+            state.shuffleMode = state.shuffle ? "playlist" : "off";
+          }
+          state.shuffle = state.shuffleMode !== "off";
           state.eqGains = normalizeEqGains(state.eqGains);
           state.eqCustomPresets = normalizeEqCustomPresets(
             state.eqCustomPresets,
@@ -388,6 +403,7 @@ export const usePlayerStore = create<PlayerStore>()(
           : {}),
         repeat: state.repeat,
         shuffle: state.shuffle,
+        shuffleMode: state.shuffleMode,
         volume: state.volume,
         audioQuality: state.audioQuality,
         miniPlayerStyle: state.miniPlayerStyle,

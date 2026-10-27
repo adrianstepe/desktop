@@ -9,6 +9,7 @@ import {
   nextRepeatMode,
 } from "@/features/player";
 import SongCardWithMenu from "@/features/player/ui/SongCardWithMenu";
+import { SparkleStar } from "@/features/player/ui/ShuffleIcon";
 import { useTranslation } from "@/languages";
 import {
   ReorderDropPlaceholder,
@@ -251,6 +252,16 @@ const QueueList = memo(function QueueList({
                 (item as { cover_url?: string }).cover_url ??
                 ""
               }
+              icon={
+                item.isRecommended ? (
+                  <span
+                    className="inline-flex items-center text-text-secondary"
+                    title={t("player.shuffle_recommended")}
+                  >
+                    <SparkleStar size={12} />
+                  </span>
+                ) : undefined
+              }
               showReorderHandle
               onRemoveFromQueue={
                 index <= currentIndex || removingIndex !== null
@@ -383,9 +394,10 @@ function RightDrawer({ onClose }: RightDrawerProps) {
       <RightDrawerHeader
         trackCount={player.queue.length}
         shuffle={player.shuffle}
+        shuffleMode={player.shuffleMode}
         repeat={player.repeat}
         canClear={player.queue.length > 1}
-        onShuffleToggle={() => playerEngine.setShuffle(!player.shuffle)}
+        onShuffleToggle={() => playerEngine.cycleShuffleMode()}
         onRepeatCycle={() =>
           playerEngine.setRepeat(
             nextRepeatMode(

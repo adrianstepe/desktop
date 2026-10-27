@@ -13,11 +13,11 @@ import {
   VolumeLoud,
   Repeat,
   RepeatOne,
-  Shuffle,
 } from "@solar-icons/react";
 import { HeartFill, HeartLine } from "@mingcute/react";
 
 import { PlayerMorphIcon, ICON_PLAY, ICON_PAUSE } from "./morphPlayerIcons";
+import { ShuffleIcon } from "./ShuffleIcon";
 
 import { usePlayerState } from "../hooks/usePlayerState";
 import { playerEngine } from "../engine/playerEngine";
@@ -800,18 +800,14 @@ function MiniPlayer({
               <button
                 type="button"
                 aria-label="Shuffle"
-                title={
-                  player.shuffle
-                    ? t("player.shuffle_on")
-                    : t("player.shuffle_off")
-                }
+                title={t(`player.shuffle_${player.shuffleMode}`)}
                 className={`${iconButtonClass} ${
-                  player.shuffle ? activeToggleClass : ""
+                  player.shuffleMode !== "off" ? activeToggleClass : ""
                 }`}
                 onPointerDown={(e) => e.stopPropagation()}
-                onClick={() => playerEngine.setShuffle(!player.shuffle)}
+                onClick={() => playerEngine.cycleShuffleMode()}
               >
-                <Shuffle size={18} weight="Outline" />
+                <ShuffleIcon mode={player.shuffleMode} size={18} />
               </button>
               <button
                 type="button"
